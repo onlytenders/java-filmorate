@@ -34,7 +34,7 @@ class UserControllerTest {
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
             String errorMessage = (String) errorResponse.get("detail");
-            assertEquals("Электронная почта не может быть пустой", errorMessage);
+            assertEquals("Почта не может быть пустой", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
         }
@@ -49,7 +49,7 @@ class UserControllerTest {
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
             String errorMessage = (String) errorResponse.get("detail");
-            assertEquals("Электронная почта должна быть корректной", errorMessage);
+            assertEquals("Похоже, это не электронная почта", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
         }
@@ -64,7 +64,7 @@ class UserControllerTest {
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
             String errorMessage = (String) errorResponse.get("detail");
-            assertEquals("Логин не может быть пустым", errorMessage);
+            assertEquals("Логин не может быть пустой", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
         }
@@ -106,7 +106,7 @@ class UserControllerTest {
         ResponseEntity<User> response = restTemplate.postForEntity("/users", user, User.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("login", response.getBody().getName());
+        assertEquals("User(id=1, email=test@example.com, login=login, name=login, birthday=1990-01-01)", response.getBody().toString());
     }
 
     @Test

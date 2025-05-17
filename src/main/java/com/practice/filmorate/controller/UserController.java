@@ -30,7 +30,7 @@ public class UserController {
 
         user.setId(idGen.getAndIncrement());
 
-        if (user.getName() == null) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
 

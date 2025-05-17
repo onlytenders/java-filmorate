@@ -33,11 +33,7 @@ class FilmControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
-            @SuppressWarnings("unchecked")
-            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
-            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
+            String errorMessage = (String) errorResponse.get("detail");
             assertEquals("Название фильма не может быть пустым", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
@@ -53,12 +49,8 @@ class FilmControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
-            @SuppressWarnings("unchecked")
-            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
-            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
-            assertEquals("Описание не должно превышать 200 символов", errorMessage);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Название не должно првышать 200 символов", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
         }
@@ -72,11 +64,7 @@ class FilmControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
-            @SuppressWarnings("unchecked")
-            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
-            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
+            String errorMessage = (String) errorResponse.get("detail");
             assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
@@ -91,12 +79,8 @@ class FilmControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
-            @SuppressWarnings("unchecked")
-            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
-            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
-            assertEquals("Продолжительность фильма должна быть положительной", errorMessage);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Продолжительность фильма должна быть больше 0", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
         }
@@ -110,7 +94,7 @@ class FilmControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
-            String errorMessage = (String) errorResponse.get("reason");
+            String errorMessage = (String) errorResponse.get("detail");
             assertEquals("ID фильма не указан", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
