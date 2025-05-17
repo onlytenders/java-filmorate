@@ -10,6 +10,6 @@ public class NotEarlierThanValidator implements ConstraintValidator<NotEarlierTh
 
     @Override
     public boolean isValid(LocalDate date, ConstraintValidatorContext constraintValidatorContext) {
-        return !date.isBefore(LocalDate.parse("28-12-1985"));
+        return !date.isBefore(LocalDate.of(1895, 12, 28));
     }
 }

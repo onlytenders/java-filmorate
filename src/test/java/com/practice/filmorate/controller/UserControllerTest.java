@@ -1,5 +1,6 @@
 package com.practice.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.filmorate.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,13 +22,22 @@ class UserControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void testCreateUserWithEmptyEmail() {
         User user = new User(null, "", "login", "Name", LocalDate.of(1990, 1, 1));
         ResponseEntity<String> response = restTemplate.postForEntity("/users", user, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Почта не может быть пустой", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Электронная почта не может быть пустой", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -35,7 +46,13 @@ class UserControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity("/users", user, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Похоже, это не электронная почта", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Электронная почта должна быть корректной", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -44,7 +61,13 @@ class UserControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity("/users", user, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Логин не может быть пустой", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Логин не может быть пустым", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -53,7 +76,13 @@ class UserControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity("/users", user, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Логин не может содержать пробелы", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Логин не может содержать пробелы", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -62,7 +91,13 @@ class UserControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity("/users", user, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Дата рождения не может быть в будущем", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Дата рождения не может быть в будущем", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -80,7 +115,13 @@ class UserControllerTest {
         ResponseEntity<String> response = restTemplate.exchange("/users", HttpMethod.PUT, new HttpEntity<>(user), String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("ID пользователя не указан", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("ID пользователя не указан", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -89,6 +130,12 @@ class UserControllerTest {
         ResponseEntity<String> response = restTemplate.exchange("/users", HttpMethod.PUT, new HttpEntity<>(user), String.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Пользователь с ID 999 не найден", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("detail");
+            assertEquals("Пользователь с ID 999 не найден", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 }

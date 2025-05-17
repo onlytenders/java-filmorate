@@ -14,16 +14,16 @@ public class ErrorHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleValidationException(MethodArgumentNotValidException ex) {
+    public MethodArgumentNotValidException handleValidationException(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         log.error("Ошибка валидации: {}", errorMessage);
-        return errorMessage;
+        return ex;
     }
 
     @ExceptionHandler(ResponseStatusException.class)
     @ResponseStatus
-    public String handleResponseStatusException(ResponseStatusException ex) {
+    public ResponseStatusException handleResponseStatusException(ResponseStatusException ex) {
         log.error("Ошибка: {}", ex.getReason());
-        return ex.getReason();
+        return ex;
     }
 }

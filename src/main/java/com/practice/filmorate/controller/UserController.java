@@ -9,7 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -31,16 +30,14 @@ public class UserController {
 
         user.setId(idGen.getAndIncrement());
 
-        log.info(user.toString());
-
-        if (user.getName().isBlank()) {
+        if (user.getName() == null) {
             user.setName(user.getLogin());
         }
 
-        log.info(user.toString());
-
         users.add(user);
-        log.info("Добавлен новый фильм: {}", user.getName());
+
+        log.info("Добавлен новый пользователь: " + user.getLogin());
+
         return user;
 
     }
@@ -53,8 +50,9 @@ public class UserController {
 
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getId().equals(user.getId())) {
-                log.info("Обновлен пользователь: {}", user.getLogin());
-                return users.set(i, user);
+                log.info("Обновлен пользователь: {}", users.get(i).getLogin());
+                users.set(i, user);
+                return user;
             }
         }
 

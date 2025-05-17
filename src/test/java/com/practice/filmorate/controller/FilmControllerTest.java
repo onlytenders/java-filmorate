@@ -1,5 +1,6 @@
 package com.practice.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.filmorate.model.Film;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,23 +22,46 @@ class FilmControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void testCreateFilmWithEmptyName() {
         Film film = new Film(null, "", "Description", LocalDate.of(2000, 1, 1), 120);
         ResponseEntity<String> response = restTemplate.postForEntity("/films", film, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Название фильма не может быть пустым", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
+            @SuppressWarnings("unchecked")
+            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
+            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
+            assertEquals("Название фильма не может быть пустым", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
     void testCreateFilmWithTooLongDescription() {
-        String longDescription = "a".repeat(201); // 201 символ
+        String longDescription = "a".repeat(201);
         Film film = new Film(null, "Test Film", longDescription, LocalDate.of(2000, 1, 1), 120);
         ResponseEntity<String> response = restTemplate.postForEntity("/films", film, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Описание не должно превышать 200 символов", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
+            @SuppressWarnings("unchecked")
+            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
+            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
+            assertEquals("Описание не должно превышать 200 символов", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -45,7 +70,17 @@ class FilmControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity("/films", film, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
+            @SuppressWarnings("unchecked")
+            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
+            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
+            assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -54,7 +89,17 @@ class FilmControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity("/films", film, String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Продолжительность фильма должна быть положительной", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> bindingResult = (Map<String, Object>) errorResponse.get("bindingResult");
+            @SuppressWarnings("unchecked")
+            java.util.List<Map<String, Object>> allErrors = (java.util.List<Map<String, Object>>) bindingResult.get("allErrors");
+            String errorMessage = (String) allErrors.get(0).get("defaultMessage");
+            assertEquals("Продолжительность фильма должна быть положительной", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -63,7 +108,13 @@ class FilmControllerTest {
         ResponseEntity<String> response = restTemplate.exchange("/films", HttpMethod.PUT, new HttpEntity<>(film), String.class);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("ID фильма не указан", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("reason");
+            assertEquals("ID фильма не указан", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -72,7 +123,13 @@ class FilmControllerTest {
         ResponseEntity<String> response = restTemplate.exchange("/films", HttpMethod.PUT, new HttpEntity<>(film), String.class);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Фильм с ID 999 не найден", response.getBody());
+        try {
+            Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
+            String errorMessage = (String) errorResponse.get("reason");
+            assertEquals("Фильм с ID 999 не найден", errorMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
+        }
     }
 
     @Test
@@ -87,7 +144,7 @@ class FilmControllerTest {
 
     @Test
     void testCreateFilmWithBoundaryDescription() {
-        String boundaryDescription = "a".repeat(200); // Ровно 200 символов
+        String boundaryDescription = "a".repeat(200);
         Film film = new Film(null, "Test Film", boundaryDescription, LocalDate.of(2000, 1, 1), 120);
         ResponseEntity<Film> response = restTemplate.postForEntity("/films", film, Film.class);
 
