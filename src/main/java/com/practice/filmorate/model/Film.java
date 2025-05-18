@@ -5,8 +5,11 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +29,7 @@ public class Film {
 
     @Positive(message = "Продолжительность фильма должна быть больше 0")
     private int duration;
+
+    @UniqueElements(message = "Этот пользователь уже поставил лайк")
+    private Set<User> liked = new HashSet<>();
 }
