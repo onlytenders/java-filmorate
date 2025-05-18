@@ -1,5 +1,7 @@
 package com.practice.filmorate.model;
 
+import com.practice.filmorate.validators.validationGroups.NotBlankGroup;
+import com.practice.filmorate.validators.validationGroups.PatternGroup;
 import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
