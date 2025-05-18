@@ -109,7 +109,7 @@ class FilmControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         try {
             Map<String, Object> errorResponse = objectMapper.readValue(response.getBody(), Map.class);
-            String errorMessage = (String) errorResponse.get("reason");
+            String errorMessage = (String) errorResponse.get("detail");
             assertEquals("Фильм с ID 999 не найден", errorMessage);
         } catch (Exception e) {
             throw new RuntimeException("Не удалось распарсить JSON-ответ", e);
@@ -123,7 +123,9 @@ class FilmControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Test Film", response.getBody().getName());
-        assertEquals(1L, response.getBody().getId());
+        assertEquals("Description", response.getBody().getDescription());
+        assertEquals(LocalDate.of(2000, 1, 1), response.getBody().getReleaseDate());
+        assertEquals(120, response.getBody().getDuration());
     }
 
     @Test

@@ -24,7 +24,7 @@ public class FilmController {
     public Film addFilm(@Valid @RequestBody Film film) {
         film.setId(idGen.getAndIncrement());
         films.add(film);
-        log.info("Добавлен новый фильм: {}", film);
+        log.info("Добавлен новый фильм: {}", films);
         return film;
     }
 

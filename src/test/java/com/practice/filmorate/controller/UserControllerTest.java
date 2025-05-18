@@ -106,7 +106,10 @@ class UserControllerTest {
         ResponseEntity<User> response = restTemplate.postForEntity("/users", user, User.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User(id=1, email=test@example.com, login=login, name=login, birthday=1990-01-01)", response.getBody().toString());
+        assertEquals("test@example.com", response.getBody().getEmail());
+        assertEquals("login", response.getBody().getLogin());
+        assertEquals("login", response.getBody().getName());
+        assertEquals(LocalDate.of(1990, 1, 1), response.getBody().getBirthday());
     }
 
     @Test
