@@ -15,16 +15,23 @@ public class InMemoryUserStorage implements UserStorage {
     private final List<User> users = new ArrayList<>();
 
     @Override
-    public Long addUser(User user) {
+    public User addUser(User user) {
         users.add(user);
-        log.info("Добавлен новый пользователь: " + user.getLogin());
-        return user.getId();
+        log.info("Добавлен новый пользователь: " + user);
+        return user;
     }
 
     @Override
     public User updateUser(User user) {
-        log.info("Обновлен пользователь: {}", user.getLogin());
-        users.set(user.getId().intValue(), user);
+
+        for (User u : users) {
+            if (u.getId().equals(user.getId())) {
+                u = user;
+            }
+        }
+
+        log.info("Обновлен пользователь: {}", user);
+
         return user;
     }
 

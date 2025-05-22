@@ -26,18 +26,21 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public Long addFilm(@Valid Film film) {
+    public Film addFilm(@Valid Film film) {
         film.setId(idGen.getAndIncrement());
-        return filmStorage.addFilm(film);
+        log.info("Фильм с ID " + film.getId());
+        filmStorage.addFilm(film);
+        log.info("Следующий ID " + idGen.get());
+        return film;
     }
 
-    public Long updateFilm(@Valid Film film) {
+    public Film updateFilm(@Valid Film film) {
         if (film.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID фильма не указан");
         }
 
         if (filmStorage.getFilmById(film.getId()) != null) {
-            filmStorage.updateFilm(film);
+            return filmStorage.updateFilm(film);
         }
 
         log.error("Фильм с ID {} не найден", film.getId());

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface FilmStorage {
-    Long addFilm(Film film);
+    Film addFilm(Film film);
     Film updateFilm(Film film);
     Film deleteFilm(Long id);
     Film getFilmById(Long id);

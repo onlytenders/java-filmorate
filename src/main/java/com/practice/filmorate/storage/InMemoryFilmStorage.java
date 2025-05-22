@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -15,16 +14,23 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final List<Film> films = new ArrayList<>();
 
     @Override
-    public Long addFilm(Film film) {
+    public Film addFilm(Film film) {
         films.add(film);
-        log.info("Добавлен новый фильм: {}", films);
-        return film.getId();
+        log.info("Добавлен новый фильм: {}", film);
+        return film;
 }
 
     @Override
     public Film updateFilm(Film film) {
-        log.info("Обновлен фильм: {}", film.getName());
-        films.set(film.getId().intValue(), film);
+
+        for (Film f : films) {
+            if (f.getId().equals(film.getId())) {
+                f = film;
+            }
+        }
+
+        log.info("Обновлен фильм: {}", film);
+
         return film;
     }
 
@@ -43,6 +49,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Long id) {
+
+        log.info("Запрошен фильм с ID: {}", id);
 
         for (Film film : films) {
             if (film.getId().equals(id)) {

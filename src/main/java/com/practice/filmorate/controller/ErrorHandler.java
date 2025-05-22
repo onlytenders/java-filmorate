@@ -1,7 +1,9 @@
 package com.practice.filmorate.controller;
 
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +20,15 @@ public class ErrorHandler {
     public ResponseStatusException handleValidationException(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         log.error("Ошибка валидации: {}", errorMessage);
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return new ResponseStatusException(HttpStatusCode.valueOf(400), ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseStatusException handleNotFoundException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error("Объект не найден: {}", errorMessage);
+        return new ResponseStatusException(HttpStatusCode.valueOf(404), ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
     @ExceptionHandler(ResponseStatusException.class)

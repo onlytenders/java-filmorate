@@ -27,13 +27,15 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public Long addUser(@Valid User user) {
+    public User addUser(@Valid User user) {
         user.setId(idGen.getAndIncrement());
 
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        return userStorage.addUser(user);
+
+        userStorage.addUser(user);
+        return user;
     }
 
     public User updateUser(@Valid User user) {

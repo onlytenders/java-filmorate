@@ -1,6 +1,5 @@
 package com.practice.filmorate.controller;
 
-import com.practice.filmorate.model.Film;
 import com.practice.filmorate.model.User;
 import com.practice.filmorate.service.UserService;
 import jakarta.validation.Valid;
@@ -29,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping
-    public Long addUser(@Valid @RequestBody User user) {
+    public User addUser(@Valid @RequestBody User user) {
         return userService.addUser(user);
     }
 

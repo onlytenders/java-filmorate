@@ -22,12 +22,12 @@ public class FilmController {
     }
 
     @PostMapping
-    public Long addFilm(@Valid @RequestBody Film film) {
+    public Film addFilm(@Valid @RequestBody Film film) {
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Long updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         return filmService.updateFilm(film);
     }
 
