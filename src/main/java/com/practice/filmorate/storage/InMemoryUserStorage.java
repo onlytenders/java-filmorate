@@ -2,59 +2,34 @@ package com.practice.filmorate.storage;
 
 import com.practice.filmorate.model.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Set;
 
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
     private final List<User> users = new ArrayList<>();
-    private final AtomicLong idGen = new AtomicLong(1);
 
     @Override
-    public User addUser(User user) {
-        user.setId(idGen.getAndIncrement());
-
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-
+    public Long addUser(User user) {
         users.add(user);
-
         log.info("Добавлен новый пользователь: " + user.getLogin());
-
-        return user;
+        return user.getId();
     }
 
     @Override
     public User updateUser(User user) {
-        if (user.getId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID пользователя не указан");
-        }
-
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getId().equals(user.getId())) {
-                log.info("Обновлен пользователь: {}", users.get(i).getLogin());
-                users.set(i, user);
-                return users.get(i);
-            }
-        }
-
-        log.error("Пользователь с ID {} не найден", user.getId());
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + user.getId() + " не найден");
+        log.info("Обновлен пользователь: {}", user.getLogin());
+        users.set(user.getId().intValue(), user);
+        return user;
     }
 
     @Override
     public User deleteUser(Long id) {
-        if (id == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID пользователя не указан");
-        }
 
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getId().equals(id)) {
@@ -62,15 +37,16 @@ public class InMemoryUserStorage implements UserStorage {
             }
         }
 
-        log.error("Пользователь с ID {} не найден", id);
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + id + " не найден");
+        log.info("Удален пользователь с ID: {}", id);
+
+        return null;
+
     }
 
     @Override
     public User getUserById(Long id) {
-        if (id == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID пользователя не указан");
-        }
+
+        log.info("Запрошен пользователь с ID: {}", id);
 
         for (User user : users) {
             if (user.getId().equals(id)) {
@@ -78,13 +54,52 @@ public class InMemoryUserStorage implements UserStorage {
             }
         }
 
-        log.error("Пользователь с ID {} не найден", id);
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + id + " не найден");
+        return null;
     }
 
     @Override
     public List<User> getAllUsers() {
         log.info("Запрошены все пользователи");
         return users;
+    }
+
+    @Override
+    public User addFriend(Long idUser, Long idFriend) {
+        getUserById(idUser).getFriends().add(idFriend);
+        getUserById(idFriend).getFriends().add(idUser);
+        log.info("Пользователь {} добавил в друзья {}", idUser, idFriend);
+        return getUserById(idUser);
+    }
+
+    @Override
+    public User removeFriend(Long idUser, Long idFriend) {
+        getUserById(idUser).getFriends().remove(idFriend);
+        getUserById(idFriend).getFriends().remove(idUser);
+        log.info("Пользователь {} убрал из друзей {}", idUser, idFriend);
+        return getUserById(idUser);
+    }
+
+    @Override
+    public Set<Long> getAllFriends(Long idUser) {
+        log.info("Список друзей пользователя {}", idUser);
+        return getUserById(idUser).getFriends();
+    }
+
+    @Override
+    public Set<Long> getAllLikes(Long idUser) {
+        log.info("Запрошены все лайки пользователя {}", idUser);
+        return getUserById(idUser).getLikedFilms();
+    }
+
+    @Override
+    public Long hitLike(Long userId, Long filmId) {
+        getUserById(userId).getLikedFilms().add(filmId);
+        return filmId;
+    }
+
+    @Override
+    public Long removeLike(Long userId, Long filmId) {
+        getUserById(userId).getLikedFilms().remove(filmId);
+        return filmId;
     }
 }

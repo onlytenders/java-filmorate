@@ -31,5 +31,5 @@ public class Film {
     private int duration;
 
     @UniqueElements(message = "Этот пользователь уже поставил лайк")
-    private Set<User> liked = new HashSet<>();
+    private Set<Long> liked = new HashSet<>();
 }

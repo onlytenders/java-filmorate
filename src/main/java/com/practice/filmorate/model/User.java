@@ -35,8 +35,8 @@ public class User {
     private LocalDate birthday;
 
     @UniqueElements(message = "Этот пользователь уже есть в друзьях")
-    private Set<User> friends = new HashSet<>();
+    private Set<Long> friends = new HashSet<>();
 
     @UniqueElements(message = "Лайк уже поставлен на этот фильм")
-    private Set<Film> likedFilms = new HashSet<>();
+    private Set<Long> likedFilms = new HashSet<>();
 }

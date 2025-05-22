@@ -1,8 +1,8 @@
 package com.practice.filmorate.controller;
 
+import com.practice.filmorate.model.Film;
 import com.practice.filmorate.model.User;
 import com.practice.filmorate.service.UserService;
-import com.practice.filmorate.storage.UserStorage;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,32 +16,30 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserStorage userStorage;
     private final UserService userService;
 
     @Autowired
-    public UserController (UserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
+    public UserController (UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        return userService.getAllUsers();
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-        return userStorage.addUser(user);
+    public Long addUser(@Valid @RequestBody User user) {
+        return userService.addUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        return userStorage.updateUser(user);
+        return userService.updateUser(user);
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> getAllFriends(@PathVariable Long id) {
+    public Set<Long> getAllFriends(@PathVariable Long id) {
         return userService.getAllFriends(id);
     }
 
@@ -50,13 +48,23 @@ public class UserController {
         return userService.addFriend(userId, friendId);
     }
 
-    @PutMapping("/{userId}/friends/{friendId}/delete")
+    @DeleteMapping("/{userId}/friends/{friendId}")
     public User deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        return userService.deleteFriend(userId, friendId);
+        return userService.removeFriend(userId, friendId);
     }
 
-    @GetMapping("/{userId}/friends/{friendId}/mutual")
-    public Set<User> mutualFriends(@PathVariable Long userId, @PathVariable Long friendId) {
+    @GetMapping("/{id}/likes")
+    public Set<Long> getAllLikes(@PathVariable Long id) {
+        return userService.getAllLikes(id);
+    }
+
+    @GetMapping("/{userId}/friends/common/{friendId}")
+    public Set<Long> mutualFriends(@PathVariable Long userId, @PathVariable Long friendId) {
         return userService.mutualFriends(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/likes/{friendId}/mutual")
+    public Set<Long> mutualLikes(@PathVariable Long userId, @PathVariable Long friendId) {
+        return userService.mutualLikes(userId, friendId);
     }
 }
